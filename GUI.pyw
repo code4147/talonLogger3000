@@ -23,8 +23,10 @@ target = clf.sense(RemoteTarget('106A'), RemoteTarget('106B'), RemoteTarget('212
 pygame_icon = pygame.image.load(r'assets/TalonLoggericon.png')
 pygame.display.set_icon(pygame_icon)
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+#screen = pygame.display.set_mode((0, 0), pygame.RESIZABLE)
 pygame.display.set_caption('Talon Logger 3000')
 screen.fill((227, 227, 227))
+rick_image = pygame.image.load(r'assets/rick.png')
 image = pygame.image.load(r'assets/TalonLoggerLogo.png')
 image_rect = image.get_rect ()
 image_rect.center = (screen.get_width()/2, 0 + 100)
@@ -33,6 +35,9 @@ admin_font = pygame.font.Font(r'assets/ValorantFont.ttf', 42)
 login_font = pygame.font.Font(r'assets/ValorantFont.ttf', 42)
 success_sound = pygame.mixer.Sound(r'assets/login.wav')
 error_sound = pygame.mixer.Sound(r'assets/logout.wav')
+pygame.mixer.music.load(r'assets/Ghost_Astley_Tokyo.wav')
+pygame.mixer.music.set_volume(0.25)
+#pygame.mixer.music.play()
 rick = False
 superior_font = False
 
@@ -41,6 +46,8 @@ running = True
 while running:
     # Did the user click the window close button?
     screen.blit(image, (image_rect.left, image_rect.top))
+    if rick:
+        screen.blit(rick_image, (-50, screen.get_height()-500))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -68,6 +75,8 @@ while running:
     logged_on_users = logger_data[5]
     screen.fill((227, 227, 227))
     screen.blit(image, (image_rect.left, image_rect.top))
+    if rick:
+        screen.blit(rick_image, (-50, screen.get_height()-500))
 
 
 
@@ -161,7 +170,10 @@ while running:
                                             
                                                 if row[0] == name:
                                                     scan_num = row[1]
+                                                    
                                             logger_data = logger3000(scan_num, logged_on_users)
+                                            if scan_num == 'AAF5CF23':
+                                                logger_data[1] = 'null'
                                             running_inside_inside = False
                                             running_inside = False
                                             continue
@@ -276,8 +288,10 @@ while running:
                                         rick = not rick
                                         if rick:
                                             rick_button = font.render('Rick (x)', True, (100, 100, 100), (227, 227, 227))
+                                            pygame.mixer.music.play()
                                         else:
                                             rick_button = font.render('Rick ( )', True, (100, 100, 100), (227, 227, 227))
+                                            pygame.mixer.music.stop()
                                         screen.blit(rick_button, rick_button_rect)
                                         
 
@@ -317,19 +331,21 @@ while running:
 
     screen.fill((227, 227, 227))
     screen.blit(image, (image_rect.left, image_rect.top))
+    if rick:
+        screen.blit(rick_image, (-50, screen.get_height()-500))
 
     if logger_data[1] != 'null':
-        if rick:
-            success_sound = pygame.mixer.Sound(r'assets/rick.wav')
-        else:
-            success_sound = pygame.mixer.Sound(r'assets/login.wav')
+        #if rick:
+        #    success_sound = pygame.mixer.Sound(r'assets/rick.wav')
+        #else:
+        #    success_sound = pygame.mixer.Sound(r'assets/login.wav')
         if logger_data[4] == "True":
             print(logger_data[0] +  ' has been logged in')
             logged_in_text = admin_font.render(logger_data[0] +  ' has been logged in', True, (0, 255, 0), (0, 0, 128))
             logged_in_text_rect = logged_in_text.get_rect(center=(screen.get_width()/2, screen.get_height()/2))
             screen.blit(logged_in_text, logged_in_text_rect)
             pygame.mixer.Sound.play(success_sound)
-            pygame.mixer.music.stop()
+
         
         else:
             print(logger_data[0] + ' has been logged out')
@@ -337,19 +353,20 @@ while running:
             logged_out_text_rect = logged_out_text.get_rect(center=(screen.get_width()/2, screen.get_height()/2))
             screen.blit(logged_out_text, logged_out_text_rect)
             pygame.mixer.Sound.play(success_sound)
-            pygame.mixer.music.stop()
+
     
     else:
         print(scan_num)
         print('ERROR!')
-        error_text = admin_font.render(logger_data[0] +  ' has been logged out', True, (0, 255, 0), (0, 0, 128))
+        error_text = admin_font.render('ERROR!', True, (0, 255, 0), (0, 0, 128))
         error_text_rect = error_text.get_rect(center=(screen.get_width()/2, screen.get_height()/2))
         screen.blit(error_text, error_text_rect)
         pygame.mixer.Sound.play(error_sound)
-        pygame.mixer.music.stop()
+
     pygame.display.update()
     time.sleep(2) 
     screen.fill((227, 227, 227))
 
 clf.close()
 pygame.quit()
+quit()
