@@ -5,9 +5,31 @@ import nfc
 from nfc.clf import RemoteTarget
 import pygame
 import time
+import datetime
+import os.path
 pygame.init()
 
+# THIS IS THE READER PARAMETER VARIABLE!
+
+rfid_reader = "tty"
+
+# THIS IS THE ID FOR THE ADMIN CARD!
+
+admin_card_id = "AAF5CF23"
+
+
 #grab logon data from csv
+t = datetime.datetime.now()
+path_csv = r'./FRClog' + str(t.year) + str('%02d' % t.month) + str('%02d' % t.day) + ".csv"
+print(path_csv)
+
+if os.path.exists(path_csv):
+    pass
+    print("")
+else:
+    open(path_csv, 'x')
+
+
 with open('logonList.csv', newline='') as logonList:
     for ac in csv.reader(logonList):
             logged_on_users = ac
@@ -16,7 +38,7 @@ with open('logonList.csv', newline='') as logonList:
 
 # initialize nfc scanner
 clf = nfc.ContactlessFrontend()
-assert clf.open('tty:USB0:pn532') is True 
+assert clf.open(rfid_reader) is True 
 target = clf.sense(RemoteTarget('106A'), RemoteTarget('106B'), RemoteTarget('212F'))
 
 #setup pygame window
@@ -71,6 +93,14 @@ while running:
     #print(scan_num)
     #quit = input(quit)
     #print("heyo test after func call" + str(logged_on_users))
+
+    scan_num = str(tag)
+
+
+    for i in scan_num:
+        if i == 'I':
+            scan_num = scan_num[scan_num.index(i)+3:]
+
     logger_data = logger3000(scan_num, logged_on_users)
     logged_on_users = logger_data[5]
     screen.fill((227, 227, 227))
@@ -80,7 +110,7 @@ while running:
 
 
 
-    if logger_data[1] == 'AAF5CF23':
+    if logger_data[1] == admin_card_id:
 
         screen.fill((227, 227, 227))
         admin_text = admin_font.render('Admin Panel', True, (0, 0, 0), (227, 227, 227))
@@ -288,7 +318,7 @@ while running:
                                         rick = not rick
                                         if rick:
                                             rick_button = font.render('Rick (x)', True, (100, 100, 100), (227, 227, 227))
-                                            pygame.mixer.music.play()
+                                            #pygame.mixer.music.play()
                                         else:
                                             rick_button = font.render('Rick ( )', True, (100, 100, 100), (227, 227, 227))
                                             pygame.mixer.music.stop()
@@ -335,10 +365,10 @@ while running:
         screen.blit(rick_image, (-50, screen.get_height()-500))
 
     if logger_data[1] != 'null':
-        #if rick:
-        #    success_sound = pygame.mixer.Sound(r'assets/rick.wav')
-        #else:
-        #    success_sound = pygame.mixer.Sound(r'assets/login.wav')
+        if rick:
+            success_sound = pygame.mixer.Sound(r'assets/rick.wav')
+        else:
+            success_sound = pygame.mixer.Sound(r'assets/login.wav')
         if logger_data[4] == "True":
             print(logger_data[0] +  ' has been logged in')
             logged_in_text = admin_font.render(logger_data[0] +  ' has been logged in', True, (0, 255, 0), (0, 0, 128))

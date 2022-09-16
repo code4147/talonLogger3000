@@ -2,6 +2,9 @@ import csv
 import datetime
 
 
+t = datetime.datetime.now()
+path_log = r'./FRClog' + str(t.year) + str('%02d' % t.month) + str('%02d' % t.day) + ".csv"
+
 
 
 # logger3000 is the function that finds, sorts, and records with scanner number as input (and the logged_on_user list)
@@ -12,6 +15,7 @@ def logger3000(_scan_num, _logged_on_users):
     write = False
 
     # Grab data from users csv file
+
     with open('users.csv', newline='') as users_csv:
         user_read = csv.reader(users_csv)
 
@@ -41,8 +45,8 @@ def logger3000(_scan_num, _logged_on_users):
         date = str(t.month) + '/' + str(t.day) + '/' + str(t.year)
 
         # write data to log csv file
-        with open('log.csv', 'a+', newline='') as log_csv:
-            csv.writer(log_csv).writerow([name, _scan_num, time, date, logon])
+        with open(path_log, 'a+', newline='') as log_csv:
+            csv.writer(log_csv).writerow([_scan_num, time, date, logon])
         return([name, _scan_num, time, date, logon, _logged_on_users])
 
     else:
